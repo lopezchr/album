@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+	    <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	    <title>..:: Album ::..</title>
+	    <meta name="description" content="Plataforma corporativa de reservas">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    	<meta name="viewport" content="width=device-width, initial-scale=1">
+	    <?php 
+	                
+	        $this->headLink()->appendStylesheet(PUBLIC_RELATIVEPATH."css/bootstrap.min.css");
+	        $this->headLink()->appendStylesheet(PUBLIC_RELATIVEPATH."css/bootstrap-theme.min.css");
+	        $this->headLink()->appendStylesheet(PUBLIC_RELATIVEPATH."css/bootstrap-datetimepicker.min.css");
+	        $this->headLink()->appendStylesheet(PUBLIC_RELATIVEPATH."css/jquery.dataTables.css");
+	        
+	        $this->headScript()->appendFile(PUBLIC_RELATIVEPATH."js/jquery-1.11.1.min.js");
+	        $this->headScript()->appendFile(PUBLIC_RELATIVEPATH."js/jquery.validate.min.js");
+	        $this->headScript()->appendFile(PUBLIC_RELATIVEPATH."js/jquery.form.js");;
+	        $this->headScript()->appendFile(PUBLIC_RELATIVEPATH."js/bootstrap.min.js");
+	        $this->headScript()->appendFile(PUBLIC_RELATIVEPATH."js/jquery.dataTables.js");
+	        $this->headScript()->appendFile(PUBLIC_RELATIVEPATH."js/jquery.blockUI.js");
+
+	        echo $this->headLink();
+	        echo $this->headScript();
+	        	        
+	        ?>
+
+	</head>
+	<body>
+		<!--  HEADER -->
+		<?php echo $this->layout()->content; ?>
+	</body>
+</html>
+

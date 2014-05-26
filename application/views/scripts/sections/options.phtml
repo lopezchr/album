@@ -1,0 +1,22 @@
+<div class='btn-group'>
+    <a class='btn btn-info dropdown-toggle btn-xs' data-toggle='dropdown' href='#'>
+        <span class="glyphicon glyphicon-list"></span>
+        Options
+        <span class='caret'></span>
+    </a>
+    <ul class='dropdown-menu'>
+        <li>
+        	<a onclick="javascript:getInfoSection('<?php echo $this->id ?>');">
+                <span class="glyphicon glyphicon-list"></span>
+        		<span class="glyphicon glyphicon-refresh"></span>
+        		Update
+        	</a>
+        </li>
+        <li>
+        	<a onclick="javascript:deleteSection('<?php echo $this->id ?>');">
+        		<span class="glyphicon glyphicon-trash"></span>
+        		Delete
+        	</a>
+        </li>
+    </ul>
+</div>

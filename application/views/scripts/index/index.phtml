@@ -1,0 +1,174 @@
+<script type="text/javascript">
+$(document).on("ready",startAlbums);
+
+function startAlbums () {
+
+    //init Datatable
+    $('#table_album').dataTable({
+        "sPaginationType": "full_numbers",
+        "bProcessing": true,
+        "bServerSide": true,
+        "bLengthChange": false,
+        "sAjaxSource": "/index/list-albums",
+        "aoColumns": [
+            null,
+            null,
+            null,
+            null,
+            { "bSearchable": false, "bSortable": false }] ,
+        "fnServerData": function ( sSource, aoData, fnCallback ) {
+          $.ajax( {
+            "dataType": 'json',
+            "type": "POST",
+            "url": sSource,
+            "data": aoData,
+            "success": fnCallback
+          } );
+        }
+    });
+
+    ///Form validation
+    $('#albumForm').validate({
+        rules:{
+            name:"required",
+            description:"required",
+            year:{required:true,number:true,maxlength:4}
+        },
+        messages:{
+            name:"Please enter a name",
+            description:"Please insert a description",
+            year:"please enter a year (ej 2001)",
+        },
+        submitHandler: function(form) {
+            $.blockUI({ 
+                message:"Please wait....",
+                css: {
+                    border: 'none', 
+                    padding: '15px', 
+                    backgroundColor: '#000', 
+                    '-webkit-border-radius': '10px', 
+                    '-moz-border-radius': '10px', 
+                    '-ms-border-radius': '10px', 
+                    '-o-border-radius': '10px',
+                    opacity: .5, 
+                    color: '#fff' 
+                } 
+            });
+            
+            $.post('/index/modify-album',$("#albumForm").serialize(),function(data){
+                $.unblockUI();
+                if(data.success == true){
+                    if(!data.hasOwnProperty('edit')){
+                        form.reset();
+                    }
+                    //oculto el modal
+                    $("#createModal").modal('hide');
+                    //repinto la tabla
+                    $("#table_album").dataTable().fnDraw();
+                }else if(data.success == false){
+                    $("#user_message").html("<div class='alert alert-warning'><button type='button' class='close' data-dismiss='alert'>&times;</button>"+data.description+"</div>");
+                }else{
+                    $("#user_message").html("<div class='alert alert-error'><button type='button' class='close' data-dismiss='alert'>&times;</button><?php echo $this->translate('error')?></div>");
+                }
+            });
+        }
+    });
+
+    $("#createModal").on('hidden.bs.modal',function(){
+        $("#name").val('');
+        $("#description").val('');
+        $("#year").val('');
+        $("#idAlbum").val('');
+
+        
+    })
+}
+
+function saveAlbum(){
+    $("#albumForm").submit();
+}
+
+function getInfoAlbum(idAlbum){
+    $.post("/index/get-album-basic-info",{id:idAlbum},function(data){
+        $("#name").val(data.description.alb_name);
+        $("#description").val(data.description.alb_description);
+        $("#year").val(data.description.alb_year);
+        $("#idAlbum").val(data.description.alb_id);
+
+        $("#createModal").modal('show');
+    });
+}
+
+function deleteAlbum(idAlbum){
+    $.post("/index/delete-album",{id:idAlbum},function(data){
+        $("#table_album").dataTable().fnDraw();
+    });
+}
+</script>
+
+<div class="container">
+    <table id="table_album" class="table table-bordered table-hover">
+        <caption>
+            <button data-toggle="modal" data-target="#createModal" class="btn pull-left btn-info" >
+                <span class="glyphicon glyphicon-plus"></span>
+                Create Album
+            </button>
+            <h3>Album List</h3>
+        </caption>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Year</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="createModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Create Album Form</h4>
+            </div>
+            <div class="modal-body">
+
+                <form class="form-horizontal" id="albumForm">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Description</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="description" name="description" placeholder="Description">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Year</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="year" name="year" placeholder="Year">
+                            <input type="hidden" class="form-control" id="idAlbum" name="id" value="">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onClick="saveAlbum()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>

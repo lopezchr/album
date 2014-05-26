@@ -1,0 +1,62 @@
+<?php $sheetIndex = 0;?>
+<div class="container">
+	<h3>Album: <?php echo $this->album['alb_name'] ?></h3>
+	<form id="sheets_form">
+		<div class="panel-group" id="accordion">
+			<?php foreach ($this->sections as $key => $section): ?>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">
+						<a data-toggle="collapse" data-parent="#accordion" href="#collapse_<?php echo $key?>">
+							Section: <?php echo $section['als_name'] ?>
+							(<?php echo  $section['als_num_sheets']?>)
+						</a>
+					</h4>
+				</div>
+				<div id="collapse_<?php echo $key?>" class="panel-collapse collapse">
+					<div class="panel-body">
+						<?php for ($i=0; $i < $section['als_num_sheets']; $i++): ?>
+							<label class="checkbox-inline col-xs-2">
+								<input type="checkbox" name="sheets[]" value="<?php echo $sheetIndex ?>"> 
+								<?php echo $sheetIndex ?>
+							</label>
+						<?php 
+						$sheetIndex++;
+						endfor; ?>
+					</div>
+				</div>
+			</div>
+			<?php endforeach; ?>
+		</div>
+	</form>
+	<button id="save" class="btn btn-success" >Save</button>
+</div>
+
+
+<script type="text/javascript">
+	$(document).on('ready',initSheets);
+
+	function initSheets(){
+		$("#save").on('click',function(){
+			$.blockUI({ 
+                message:"Please wait...",
+                css: {
+                    border: 'none', 
+                    padding: '15px', 
+                    backgroundColor: '#000', 
+                    '-webkit-border-radius': '10px', 
+                    '-moz-border-radius': '10px', 
+                    '-ms-border-radius': '10px', 
+                    '-o-border-radius': '10px',
+                    opacity: .5, 
+                    color: '#fff' 
+                } 
+            });
+
+			$.post('/sheets/save-sheets/id/<?php echo $this->album["alb_id"] ?>',$("#sheets_form").serialize(),function(data){
+				$.unblockUI();
+				console.log(data);
+			});
+		});
+	}
+</script>

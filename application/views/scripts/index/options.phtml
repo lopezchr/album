@@ -1,0 +1,33 @@
+<div class='btn-group'>
+    <a class='btn btn-info dropdown-toggle btn-xs' data-toggle='dropdown' href='#'>
+        <span class="glyphicon glyphicon-list"></span>
+        Options
+        <span class='caret'></span>
+    </a>
+    <ul class='dropdown-menu'>
+        <li>
+        	<a onclick="javascript:getInfoAlbum('<?php echo $this->id ?>');">
+        		<span class="glyphicon glyphicon-refresh"></span>
+        		Update
+        	</a>
+        </li>
+        <li>
+        	<a onclick="javascript:deleteAlbum('<?php echo $this->id ?>');">
+        		<span class="glyphicon glyphicon-trash"></span>
+        		Delete
+        	</a>
+        </li>
+        <li>
+        	<a href="/sections/index/id/<?php echo $this->id ?>">
+        		<span class="glyphicon glyphicon-tasks"></span>
+        		Sections
+        	</a>
+        </li>
+        <li>
+            <a href="/sheets/index/id/<?php echo $this->id ?>">
+                <span class="glyphicon glyphicon-check"></span>
+                Sheets
+            </a>
+        </li>
+    </ul>
+</div>

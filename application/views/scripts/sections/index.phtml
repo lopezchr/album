@@ -1,0 +1,171 @@
+<script type="text/javascript">
+$(document).on("ready",startAlbums);
+
+function startAlbums () {
+
+    //init Datatable
+    $('#sections_table').dataTable({
+        "sPaginationType": "full_numbers",
+        "bProcessing": true,
+        "bServerSide": true,
+        "bLengthChange": false,
+        "sAjaxSource": "/sections/list-sections/id/<?php echo $this->id ?>",
+        "aoColumns": [
+            null,
+            null,
+            { "bSortable": false },
+            { "bSearchable": false, "bSortable": false }] ,
+        "fnServerData": function ( sSource, aoData, fnCallback ) {
+          $.ajax( {
+            "dataType": 'json',
+            "type": "POST",
+            "url": sSource,
+            "data": aoData,
+            "success": fnCallback
+          } );
+        }
+    }).fnSort( [ [1,'desc'] ] );;
+
+    ///Form validation
+    $('#sectionForm').validate({
+        rules:{
+            name:"required",
+            order:{required:true,number:true},
+            num_sheets:{required:true,number:true}
+        },
+        messages:{
+            name:"Please enter a name",
+            order:"Please insert a number",
+            num_sheets:"please enter a number",
+        },
+        submitHandler: function(form) {
+            $.blockUI({ 
+                message:"Please wait....",
+                css: {
+                    border: 'none', 
+                    padding: '15px', 
+                    backgroundColor: '#000', 
+                    '-webkit-border-radius': '10px', 
+                    '-moz-border-radius': '10px', 
+                    '-ms-border-radius': '10px', 
+                    '-o-border-radius': '10px',
+                    opacity: .5, 
+                    color: '#fff' 
+                } 
+            });
+            
+            $.post('/sections/modify-section',$("#sectionForm").serialize(),function(data){
+                $.unblockUI();
+                if(data.success == true){
+                    if(!data.hasOwnProperty('edit')){
+                        form.reset();
+                    }
+                    //oculto el modal
+                    $("#modify_modal").modal('hide');
+                    //repinto la tabla
+                    $("#sections_table").dataTable().fnDraw();
+                }else if(data.success == false){
+                    $("#user_message").html("<div class='alert alert-warning'><button type='button' class='close' data-dismiss='alert'>&times;</button>"+data.description+"</div>");
+                }else{
+                    $("#user_message").html("<div class='alert alert-error'><button type='button' class='close' data-dismiss='alert'>&times;</button><?php echo $this->translate('error')?></div>");
+                }
+            });
+        }
+    });
+
+    $("#modify_modal").on('hidden.bs.modal',function(){
+        $("#name").val('');
+        $("#order").val('');
+        $("#num_sheets").val('');
+        $("#idSection").val('');
+    })
+}
+
+function saveAlbum(){
+    $("#sectionForm").submit();
+}
+
+function getInfoSection(idSection){
+    $.post("/sections/get-section-basic-info",{id:idSection},function(data){
+        $("#name").val(data.description.als_name);
+        $("#order").val(data.description.als_order);
+        $("#num_sheets").val(data.description.als_num_sheets);
+        $("#idSection").val(data.description.als_id);
+
+        $("#modify_modal").modal('show');
+    });
+}
+
+function deleteSection(idAlbum){
+    $.post("/sections/delete-section",{id:idAlbum},function(data){
+        $("#sections_table").dataTable().fnDraw();
+    });
+}
+</script>
+
+<div class="container">
+    <table id="sections_table" class="table table-bordered table-hover">
+        <caption>
+            <button data-toggle="modal" data-target="#modify_modal" class="btn pull-left btn-info" >
+                <span class="glyphicon glyphicon-plus"></span>
+                Create Section
+            </button>
+            <h3>Section List</h3>
+        </caption>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Order</th>
+                <th>Number of sheets</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="modify_modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id="myModalLabel">Create Section Form</h4>
+            </div>
+            <div class="modal-body">
+
+                <form class="form-horizontal" id="sectionForm">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Order</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="order" name="order" placeholder="Order">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Number of sheets</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="num_sheets" name="num_sheets" placeholder="Number of sheets">
+                            <input type="hidden" class="form-control" id="idSection" name="id" value="">
+                            <input type="hidden" class="form-control" name="albId" value="<?php echo $this->id ?>">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onClick="saveAlbum()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
