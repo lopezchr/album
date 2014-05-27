@@ -17,7 +17,7 @@
 					<div class="panel-body">
 						<?php for ($i=0; $i < $section['als_num_sheets']; $i++): ?>
 							<label class="checkbox-inline col-xs-2">
-								<input type="checkbox" name="sheets[]" value="<?php echo $sheetIndex ?>"> 
+								<input type="checkbox" name="sheets[]" value="<?php echo $sheetIndex ?>" <?php echo (in_array($sheetIndex, $this->sheets))?'checked':'' ?>> 
 								<?php echo $sheetIndex ?>
 							</label>
 						<?php 

@@ -25,8 +25,42 @@ class Application_Model_DbTable_Sheets extends Zend_Db_Table_Abstract
     {
     	$oldSheets = $this->getSheetsByAlbum($albId);
 
-    	$arrAdd = array_diff($newSheets, $oldSheets);
+    	if (empty($oldSheets)) {
+			$this->insertSheetsByAlbum($albId,$newSheets);
+		}else{
 
+			$arrDiffInsert = array_diff($newSheets, $oldSheets);
+
+			if (!empty($arrDiffInsert)) {		
+				$this->insertSheetsByAlbum($albId,$arrDiffInsert);
+			}
+
+			$arrDiffDelete = array_diff($oldSheets, $newSheets);
+
+			if (!empty($arrDiffDelete)) {
+				$this->deleteSheetsByAlbum($albId,$arrDiffDelete);
+			}
+
+		}
+
+    }
+
+    public function insertSheetsByAlbum($albId,$arrSheets)
+    {
+    	foreach ($arrSheets as $key => $sheet) {
+    		$data = array(
+    			'alb_id' => $albId,
+    			'sht_number' => $sheet
+    			);
+    		$this->insert($data);
+    	}
+    }
+
+    public function deleteSheetsByAlbum($albId,$arrSheets)
+    {
+    	foreach ($arrSheets as $key => $sheet) {
+    		$this->delete('alb_id ='.$albId.' AND sht_number ='.$sheet);
+    	}
     }
     
 }
